@@ -20,6 +20,7 @@ async fn version(db: actix_web::web::Data<sqlx::PgPool>) -> String {
         }
 }
 
+// just for commit
 #[shuttle_runtime::main]
 async fn actix_web(
     #[shuttle_shared_db::Postgres()] pool: sqlx::PgPool,
