@@ -8,9 +8,17 @@ async fn hello_world() -> &'static str {
     "Hello World!"
 }
 
-#[get("/name")]
-async fn tell_name() -> &'static str {
-    "My name is Wann!"
+#[get("/version")]
+async fn version(db: actix_web::web::Data<sqlx::PgPool>) -> &'static str {
+    let result = Result<String, sqlx::Error> = sqlx::query_scalar("SELECT version()")
+        .fetch_one(db.get_ref())
+        .await;
+
+        match result {
+            Ok(version) => version,
+            Err(e) => format!("Error: {:?}", e),
+        }
+    "version 0.0.0"
 }
 
 #[shuttle_runtime::main]
@@ -20,10 +28,13 @@ async fn actix_web(
     pool.execute(include_str!("../../db/schema.sql"))
         .await
         .map_err(CustomError::new)?;
+    
+    let pool = actix_web::web::Data::new(pool);
 
     let config = move |cfg: &mut ServiceConfig| {
+        cfg.appData(pool)
         cfg.service(hello_world);
-        cfg.service(tell_name);
+        cfg.service(version);
     };
 
     Ok(config.into())
