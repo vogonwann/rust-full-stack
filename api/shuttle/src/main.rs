@@ -9,8 +9,8 @@ async fn hello_world() -> &'static str {
 }
 
 #[get("/version")]
-async fn version(db: actix_web::web::Data<sqlx::PgPool>) -> &'static str {
-    let result = Result<String, sqlx::Error> = sqlx::query_scalar("SELECT version()")
+async fn version(db: actix_web::web::Data<sqlx::PgPool>) -> String {
+    let result: Result<String, sqlx::Error> = sqlx::query_scalar("SELECT version()")
         .fetch_one(db.get_ref())
         .await;
 
@@ -18,7 +18,6 @@ async fn version(db: actix_web::web::Data<sqlx::PgPool>) -> &'static str {
             Ok(version) => version,
             Err(e) => format!("Error: {:?}", e),
         }
-    "version 0.0.0"
 }
 
 #[shuttle_runtime::main]
@@ -32,9 +31,9 @@ async fn actix_web(
     let pool = actix_web::web::Data::new(pool);
 
     let config = move |cfg: &mut ServiceConfig| {
-        cfg.appData(pool)
-        cfg.service(hello_world);
-        cfg.service(version);
+        cfg.app_data(pool)
+            .service(hello_world)
+            .service(version);
     };
 
     Ok(config.into())
