@@ -15,3 +15,5 @@ Cargo.lock
 Secrets*.toml
 # Ignore the static folder
 static/
++dist/
++node_modules/
