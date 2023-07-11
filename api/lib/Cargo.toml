@@ -13,3 +13,4 @@ sqlx = { version = "0.6.3", default-features = false, features = [ "runtime-acti
 # tracing
 tracing = "0.1"
 actix-rt = "2.0.0"
+shared = { path = "../../shared"}
